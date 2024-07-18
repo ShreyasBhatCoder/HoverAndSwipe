@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hover, Swipe, and Click Effect Example</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+    }
+
+    .border-hover {
+      position: fixed;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 10px;
+      /* width of the hover-sensitive area */
+      background: transparent;
+      /* invisible area */
+    }
+
+    .hidden-element {
+      position: fixed;
+      left: -200px;
+      /* Initially hide the element outside of the viewport */
+      top: 50%;
+      transform: translateY(-50%);
+      width: 200px;
+      /* Width of the hidden element */
+      background-color: lightblue;
+      transition: left 0.3s ease;
+      /* Smooth transition for the sliding effect */
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .hidden-element .close-btn {
+      position: absolute;
+      right: -30px;
+      /* Position the close button outside the hidden element */
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: lightblue;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+    }
+
+    .open-btn {
+      position: fixed;
+      left: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      background-color: lightblue;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+      padding: 10px;
+    }
+
+    /* Only show the open button when the hidden element is hidden */
+    .hidden-element:not([style*="left: 0px"])~.open-btn {
+      display: block;
+    }
+
+    /* Hide the open button when the hidden element is visible */
+    .hidden-element[style*="left: 0px"]~.open-btn {
+      display: none;
+    }
+
+    .border-hover:hover+.hidden-element {
+      left: 0;
+      /* Slide the element into view on hover */
+    }
+  </style>
+</head>
+
+<body>
+
+
+  <div class="border-hover"></div>
+  <div class="hidden-element">
+    This is the hidden element that appears on hover, swipe, or click!
+    <button class="close-btn">&larr;</button>
+  </div>
+  <button class="open-btn">&rarr;</button>
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      let startX = 0;
+      let currentX = 0;
+      const threshold = 50; // Minimum swipe distance to trigger the action
+      const hiddenElement = document.querySelector('.hidden-element');
+      const openBtn = document.querySelector('.open-btn');
+      const closeBtn = document.querySelector('.close-btn');
+
+      // Add touchstart event listener
+      document.addEventListener('touchstart', function (event) {
+        startX = event.touches[0].pageX;
+      });
+
+      // Add touchmove event listener
+      document.addEventListener('touchmove', function (event) {
+        currentX = event.touches[0].pageX;
+        if (currentX - startX > threshold) {
+          // Swipe right
+          hiddenElement.style.left = '0';
+        }
+      });
+
+      // Add touchend event listener
+      document.addEventListener('touchend', function (event) {
+        if (currentX - startX < threshold) {
+          // Hide the element if the swipe was not long enough
+          hiddenElement.style.left = '-200px';
+        }
+        // Reset startX and currentX
+        startX = 0;
+        currentX = 0;
+      });
+
+      // Add click event listener for the open button
+      openBtn.addEventListener('click', function () {
+        hiddenElement.style.left = '0';
+      });
+
+      // Add click event listener for the close button
+      closeBtn.addEventListener('click', function () {
+        hiddenElement.style.left = '-200px';
+      });
+
+      // Add click listener to hide the element when clicking outside of it
+      document.addEventListener('click', function (event) {
+        if (!hiddenElement.contains(event.target) && !openBtn.contains(event.target)) {
+          hiddenElement.style.left = '-200px';
+        }
+      });
+    });
+
+  </script>
+
+
+</body>
+
+</html>
